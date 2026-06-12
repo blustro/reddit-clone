@@ -1,11 +1,57 @@
 import { FeedSortTabs } from '@/components/feed/feed-sort-tabs';
+import { PostCard } from '@/components/feed/post-card';
+import { getSessionUser } from '@/lib/auth';
+import { batchAuthorForIds, listPostsSorted } from '@/lib/db/queries';
+import { FeedSort, Tag } from '@/lib/types';
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string; tag?: string }>;
+}) {
+  const sp = await searchParams;
+  const sortRaw = sp.sort;
+  const sort: FeedSort =
+    sortRaw === 'new' || sortRaw === 'top' ? sortRaw : 'hot';
+
+  const tagFilter = sp.tag?.toLowerCase();
+
+  const sessionUser = await getSessionUser();
+  const rows = await listPostsSorted(sort, tagFilter, sessionUser?.id);
+
+  const authorIds = [...new Set(rows.map((r) => r.post.authorId))];
+  const authorById = await batchAuthorForIds(authorIds);
+  if (sessionUser && authorById.has(sessionUser.id)) {
+    authorById.set(sessionUser.id, sessionUser);
+  }
+
+  const cards = rows.map((row) => {
+    const author = authorById.get(row.post.authorId);
+    if (!author) return null;
+
+    return (
+      <PostCard
+        key={row.post.id}
+        post={row.post}
+        author={author}
+        tagsBySlug={new Map<string, Tag>()}
+        score={row.score}
+        userVote={row.userVote}
+      />
+    );
+  });
   return (
     <div>
       <div>
         <FeedSortTabs />
-        <div></div>
+        <div>
+          {cards}
+          {rows.length === 0 && (
+            <p className='rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground'>
+              No posts match this filter.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
