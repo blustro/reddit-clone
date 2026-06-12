@@ -1,11 +1,13 @@
 import { LeftSidebar } from '@/components/ui/layout/left-sidebar';
 import { Navbar } from '@/components/ui/layout/navbar';
+import { getSessionUser } from '@/lib/auth';
 
 export default async function CoreGroupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getSessionUser();
   return (
     <>
       <Navbar />
