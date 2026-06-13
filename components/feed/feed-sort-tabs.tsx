@@ -38,7 +38,7 @@ export function FeedSortTabs({
                 'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                 active
                   ? 'bg-muted text-primary'
-                  : 'text-muted-foreground hover:bg-muted/60 hover:Ftext-foreground',
+                  : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
               )}
             >
               <Icon />
