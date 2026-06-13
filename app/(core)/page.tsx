@@ -2,7 +2,7 @@ import { FeedSortTabs } from '@/components/feed/feed-sort-tabs';
 import { PostCard } from '@/components/feed/post-card';
 import { getSessionUser } from '@/lib/auth';
 import { batchAuthorForIds, listPostsSorted, listTags } from '@/lib/db/queries';
-import { FeedSort } from '@/lib/types';
+import { FeedSort, Tag } from '@/lib/types';
 
 export default async function Home({
   searchParams,
@@ -46,7 +46,7 @@ export default async function Home({
   return (
     <div className='flex gap-8'>
       <div className='min-w-0 flex-1'>
-        <FeedSortTabs />
+        <FeedSortTabs current={sort} tag={tagFilter} />
         <div className='space-y-4'>
           {cards}
           {rows.length === 0 && (
